@@ -2,4 +2,9 @@ pandas
 numpy 
 matplotlib
 seaborn 
+scikit-learn
+dill
+Flask 
+catboost
+xgboost
 -e .
