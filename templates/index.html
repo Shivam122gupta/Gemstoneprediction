@@ -1,398 +1,561 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GemPredict | Gemstone Price Prediction</title>
-  <meta name="description" content="AI-powered gemstone price prediction using advanced machine learning. Enter gemstone attributes and get instant price estimates." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gamestone Prediction — AI-Powered Gemstone Valuation</title>
+  <meta name="description" content="Predict the true value of any gemstone using advanced machine learning. Fast, accurate and AI-powered."/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root{
+      --pink:#FF2FA3; --cyan:#00E5FF; --purple:#8B5CF6;
+      --lime:#C6FF00; --bg:#05030F; --bg2:#0B0820;
+      --white:#F8FAFC; --gray:#B6B8CC;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;min-height:100vh}
 
-    :root {
-      --gem-deep:    #0a0618;
-      --gem-navy:    #0d1b3e;
-      --gem-purple:  #2d1b69;
-      --gem-violet:  #6c3fc5;
-      --gem-amethyst:#9b59e8;
-      --gem-cyan:    #00d4ff;
-      --gem-gold:    #f5c518;
-      --gem-rose:    #e056a0;
-      --gem-teal:    #0ff0c8;
-      --text-light:  #e8e0ff;
-      --text-dim:    #9a8fc4;
-    }
+    /* ── VHS Noise ── */
+    .vhs-noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.028;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:180px 180px;animation:vhsAnim .12s steps(1) infinite}
+    @keyframes vhsAnim{0%{background-position:0 0}25%{background-position:-40px 15px}50%{background-position:15px -25px}75%{background-position:-25px 40px}}
 
-    html { scroll-behavior: smooth; }
+    /* ── Scanlines ── */
+    .scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;
+      background:repeating-linear-gradient(to bottom,transparent 0,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px)}
 
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--gem-deep);
-      color: var(--text-light);
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-    }
+    /* ── Stars canvas ── */
+    #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-    /* ── Animated starfield canvas ── */
-    #starfield {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
+    /* ── Retro Grid ── */
+    .retro-grid{position:fixed;bottom:0;left:0;right:0;height:52vh;z-index:0;perspective:280px;pointer-events:none}
+    .retro-grid-plane{width:100%;height:100%;transform:rotateX(62deg);transform-origin:bottom center;
+      background-image:linear-gradient(rgba(70,40,150,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(70,40,150,.22) 1px,transparent 1px);
+      background-size:55px 55px;animation:gridMove 7s linear infinite}
+    @keyframes gridMove{from{background-position:0 0}to{background-position:0 55px}}
+    .retro-grid::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(139,92,246,.07) 0%,transparent 55%)}
+    .retro-grid::after{content:'';position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top,#05030F 0%,transparent)}
 
-    /* ── Gradient overlay ── */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(108,63,197,.35) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0,212,255,.18) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(45,27,105,.55) 0%, transparent 70%);
-      z-index: 1;
-      pointer-events: none;
-    }
+    /* ── Glow Blobs ── */
+    .blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0}
+    .blob-a{background:rgba(255,47,163,.16);width:650px;height:550px;top:-120px;left:-180px;animation:blobA 8s ease-in-out infinite}
+    .blob-b{background:rgba(0,229,255,.11);width:500px;height:420px;top:15%;right:-160px;animation:blobB 10s ease-in-out infinite}
+    .blob-c{background:rgba(139,92,246,.14);width:700px;height:600px;bottom:-250px;left:40%;transform:translateX(-50%);animation:blobA 12s ease-in-out infinite 3s}
+    @keyframes blobA{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.12) translateY(-18px)}}
+    @keyframes blobB{0%,100%{transform:scale(1) translateX(0)}50%{transform:scale(1.1) translateX(-14px)}}
 
-    /* ── Floating gem shapes ── */
-    .gem-float {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(1px);
-      animation: floatGem linear infinite;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0;
-    }
-    @keyframes floatGem {
-      0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
-      5%   { opacity: .7; }
-      95%  { opacity: .5; }
-      100% { transform: translateY(-15vh) rotate(360deg); opacity: 0; }
-    }
+    /* ── Floating Shapes container ── */
+    #shapes{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 
-    /* ── Main wrapper ── */
-    .page {
-      position: relative;
-      z-index: 2;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-    }
+    /* ── Navbar ── */
+    .navbar{position:fixed;top:14px;left:50%;transform:translateX(-50%);
+      width:calc(100% - 2.4rem);max-width:1180px;z-index:100;
+      background:rgba(11,8,32,.58);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      border:1px solid rgba(255,255,255,.08);border-radius:20px;
+      padding:.9rem 1.6rem;display:flex;align-items:center;justify-content:space-between;
+      transition:border-color .3s,box-shadow .3s}
+    .navbar:hover{border-color:rgba(255,47,163,.2);box-shadow:0 0 40px rgba(139,92,246,.08)}
 
-    /* ── Hero ── */
-    .hero {
-      text-align: center;
-      max-width: 780px;
-      animation: fadeUp .9s ease both;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    .brand-90s{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;line-height:1;
+      color:#FFE600;text-shadow:0 0 10px rgba(255,230,0,.65),0 0 28px rgba(255,230,0,.25);letter-spacing:.04em}
+    .brand-name{font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:700;color:var(--white);letter-spacing:.08em;line-height:1}
+    .brand-sub{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:600;color:var(--pink);letter-spacing:.12em;line-height:1.1}
 
-    .gem-icon-wrap {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gem-violet), var(--gem-cyan));
-      box-shadow: 0 0 40px rgba(108,63,197,.6), 0 0 80px rgba(0,212,255,.25);
-      margin-bottom: 1.8rem;
-      animation: pulseGlow 3s ease-in-out infinite;
-    }
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 40px rgba(108,63,197,.6), 0 0 80px rgba(0,212,255,.25); }
-      50%       { box-shadow: 0 0 60px rgba(108,63,197,.9), 0 0 120px rgba(0,212,255,.45); }
-    }
-    .gem-icon-wrap svg {
-      width: 52px; height: 52px;
-      filter: drop-shadow(0 0 8px rgba(255,255,255,.8));
-    }
+    .nav-link{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.14em;
+      text-transform:uppercase;color:var(--gray);text-decoration:none;padding:.3rem .5rem;
+      border-radius:6px;transition:color .2s,text-shadow .2s;position:relative}
+    .nav-link:hover{color:var(--cyan);text-shadow:0 0 10px rgba(0,229,255,.55)}
+    .nav-link.active{color:var(--white)}
+    .nav-link.active::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+      width:70%;height:2px;background:var(--lime);border-radius:1px;box-shadow:0 0 6px var(--lime)}
 
-    .badge {
-      display: inline-block;
-      padding: .3rem 1rem;
-      border-radius: 999px;
-      background: rgba(108,63,197,.25);
-      border: 1px solid rgba(108,63,197,.5);
-      font-size: .78rem;
-      font-weight: 600;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--gem-amethyst);
-      margin-bottom: 1.2rem;
-      backdrop-filter: blur(8px);
-    }
+    .gh-btn{display:inline-flex;align-items:center;gap:.45rem;padding:.48rem 1.1rem;
+      border:1.5px solid var(--pink);border-radius:999px;background:rgba(255,47,163,.06);
+      font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;
+      color:var(--pink);text-decoration:none;transition:all .25s}
+    .gh-btn:hover{background:rgba(255,47,163,.18);box-shadow:0 0 22px rgba(255,47,163,.5);transform:scale(1.04)}
 
-    h1.hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 700;
-      line-height: 1.15;
-      margin-bottom: 1.2rem;
-      background: linear-gradient(135deg, #fff 0%, var(--gem-amethyst) 50%, var(--gem-cyan) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    /* ── Hero text ── */
+    .hero-estimate{font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(4rem,10vw,8.5rem);letter-spacing:.04em;line-height:.9;
+      background:linear-gradient(155deg,#fff 0%,#d0d0d0 30%,#f0f0f0 50%,#999 75%,#fff 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 24px rgba(255,255,255,.2))}
+    .hero-gemstone{font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(3rem,8vw,6.8rem);letter-spacing:.05em;line-height:1;
+      color:var(--pink);text-shadow:0 0 22px rgba(255,47,163,.7),0 0 55px rgba(255,47,163,.35),0 0 100px rgba(255,47,163,.15);
+      animation:pinkPulse 3.5s ease-in-out infinite}
+    @keyframes pinkPulse{0%,100%{text-shadow:0 0 22px rgba(255,47,163,.7),0 0 55px rgba(255,47,163,.35)}
+      50%{text-shadow:0 0 40px rgba(255,47,163,1),0 0 80px rgba(255,47,163,.55),0 0 130px rgba(255,47,163,.2)}}
 
-    .hero-sub {
-      font-size: 1.1rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-      max-width: 560px;
-      margin: 0 auto 2.5rem;
-      font-weight: 300;
-    }
+    /* ── Pill badge ── */
+    .pill{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem 1.1rem;
+      border-radius:999px;border:1px solid rgba(0,229,255,.35);background:rgba(0,229,255,.07);
+      backdrop-filter:blur(8px);font-family:'Orbitron',sans-serif;
+      font-size:.58rem;font-weight:700;letter-spacing:.15em;color:var(--cyan)}
+    .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:blink 1.4s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
-    /* ── CTA Button ── */
-    .cta-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: .65rem;
-      padding: 1rem 2.4rem;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--gem-violet), var(--gem-amethyst));
-      color: #fff;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 600;
-      text-decoration: none;
-      letter-spacing: .03em;
-      box-shadow: 0 8px 32px rgba(108,63,197,.5);
-      transition: transform .25s, box-shadow .25s, background .25s;
-      border: none;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
-      opacity: 0;
-      transition: opacity .25s;
-      border-radius: 999px;
-    }
-    .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 48px rgba(108,63,197,.7); }
-    .cta-btn:hover::after { opacity: 1; }
-    .cta-btn svg { width: 20px; height: 20px; }
+    /* ── Diamond SVG ── */
+    .diamond-wrap{animation:diamFloat 5s ease-in-out infinite;position:relative}
+    @keyframes diamFloat{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-16px) rotate(4deg)}66%{transform:translateY(8px) rotate(-2deg)}}
+    .diam-halo{position:absolute;inset:-50px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,229,255,.28) 0%,rgba(139,92,246,.16) 40%,transparent 70%);
+      animation:haloBreath 4s ease-in-out infinite}
+    @keyframes haloBreath{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.25);opacity:1}}
+
+    /* ── GameBoy ── */
+    .gameboy-wrap{animation:gbFloat 7s ease-in-out infinite;filter:drop-shadow(0 0 28px rgba(139,92,246,.5))}
+    @keyframes gbFloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}33%{transform:translateY(-18px) rotate(1.2deg)}66%{transform:translateY(7px) rotate(-.8deg)}}
+
+    /* ── Arcade button ── */
+    .arcade-btn{display:inline-flex;align-items:center;gap:.65rem;padding:.9rem 2.4rem;
+      border-radius:16px;background:var(--lime);color:#05030F;
+      font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:900;letter-spacing:.12em;
+      text-decoration:none;border:none;cursor:pointer;
+      box-shadow:0 6px 0 rgba(0,0,0,.5),0 8px 32px rgba(198,255,0,.35);
+      transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+    .arcade-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.28) 0%,transparent 55%)}
+    .arcade-btn:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 10px 0 rgba(0,0,0,.4),0 16px 50px rgba(198,255,0,.55),0 0 80px rgba(198,255,0,.2)}
+    .arcade-btn:active{transform:translateY(2px);box-shadow:0 4px 0 rgba(0,0,0,.5)}
+
+    .ghost-btn{display:inline-flex;align-items:center;gap:.6rem;padding:.9rem 1.8rem;
+      border-radius:16px;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);
+      color:var(--gray);font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.1em;
+      text-decoration:none;backdrop-filter:blur(8px);transition:all .25s}
+    .ghost-btn:hover{border-color:rgba(0,229,255,.45);color:var(--cyan);box-shadow:0 0 22px rgba(0,229,255,.18)}
+
+    /* ── Stats ── */
+    .stat-val{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;line-height:1;
+      background:linear-gradient(135deg,var(--cyan),var(--purple));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .stat-label{font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.13em;color:var(--gray);margin-top:.25rem;text-transform:uppercase}
+
+    /* ── Section ── */
+    .sec-tag{font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.2em;color:var(--pink);text-transform:uppercase}
+    .sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,5vw,4rem);letter-spacing:.04em;line-height:1}
 
     /* ── Feature cards ── */
-    .features {
-      display: flex;
-      gap: 1.4rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 4rem;
-      max-width: 860px;
-      animation: fadeUp 1.1s ease .3s both;
-    }
+    .feat-card{position:relative;background:rgba(11,8,32,.72);backdrop-filter:blur(16px);
+      border-radius:20px;padding:1.8rem;border:1px solid transparent;overflow:hidden;
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s}
+    .feat-card::before{content:'';position:absolute;inset:0;border-radius:20px;padding:1px;
+      background:var(--cb);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+    .feat-card:hover{transform:translateY(-7px) rotate(.3deg)}
+    .feat-card.cp{--cb:linear-gradient(135deg,#FF2FA3,rgba(255,47,163,.2))}
+    .feat-card.cc{--cb:linear-gradient(135deg,#00E5FF,rgba(0,229,255,.2))}
+    .feat-card.cv{--cb:linear-gradient(135deg,#8B5CF6,rgba(139,92,246,.2))}
+    .feat-card.cl{--cb:linear-gradient(135deg,#C6FF00,rgba(198,255,0,.2))}
+    .feat-card.cp:hover{box-shadow:0 20px 55px rgba(255,47,163,.22),0 0 0 1px rgba(255,47,163,.35)}
+    .feat-card.cc:hover{box-shadow:0 20px 55px rgba(0,229,255,.22),0 0 0 1px rgba(0,229,255,.35)}
+    .feat-card.cv:hover{box-shadow:0 20px 55px rgba(139,92,246,.22),0 0 0 1px rgba(139,92,246,.35)}
+    .feat-card.cl:hover{box-shadow:0 20px 55px rgba(198,255,0,.18),0 0 0 1px rgba(198,255,0,.35)}
+    .feat-icon{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.1rem;transition:transform .3s}
+    .feat-card:hover .feat-icon{transform:scale(1.12) rotate(-5deg)}
+    .feat-card.cp .feat-icon{background:rgba(255,47,163,.14);border:1px solid rgba(255,47,163,.28)}
+    .feat-card.cc .feat-icon{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.28)}
+    .feat-card.cv .feat-icon{background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.28)}
+    .feat-card.cl .feat-icon{background:rgba(198,255,0,.08);border:1px solid rgba(198,255,0,.28)}
+    .feat-title{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.06em;margin-bottom:.55rem}
+    .feat-desc{font-family:'Inter',sans-serif;font-size:.8rem;color:var(--gray);line-height:1.65}
+    .feat-card.cp .feat-title{color:var(--pink);text-shadow:0 0 10px rgba(255,47,163,.45)}
+    .feat-card.cc .feat-title{color:var(--cyan);text-shadow:0 0 10px rgba(0,229,255,.45)}
+    .feat-card.cv .feat-title{color:var(--purple);text-shadow:0 0 10px rgba(139,92,246,.45)}
+    .feat-card.cl .feat-title{color:var(--lime);text-shadow:0 0 10px rgba(198,255,0,.45)}
 
-    .feat-card {
-      background: rgba(255,255,255,.045);
-      border: 1px solid rgba(108,63,197,.3);
-      border-radius: 20px;
-      padding: 1.6rem 1.8rem;
-      width: 220px;
-      text-align: center;
-      backdrop-filter: blur(14px);
-      transition: transform .3s, border-color .3s, box-shadow .3s;
-    }
-    .feat-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(108,63,197,.7);
-      box-shadow: 0 16px 40px rgba(108,63,197,.3);
-    }
-    .feat-card .icon {
-      font-size: 2.2rem;
-      margin-bottom: .8rem;
-      display: block;
-    }
-    .feat-card h3 {
-      font-size: .95rem;
-      font-weight: 600;
-      color: var(--text-light);
-      margin-bottom: .4rem;
-    }
-    .feat-card p {
-      font-size: .8rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
+    /* ── Bottom badge ── */
+    .bot-badge{display:inline-flex;align-items:center;gap:.8rem;padding:.7rem 1.8rem;
+      border-radius:999px;background:rgba(11,8,32,.7);backdrop-filter:blur(16px);
+      border:1px solid rgba(139,92,246,.28);box-shadow:0 0 30px rgba(139,92,246,.12)}
+    .badge-text{font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.15em;color:var(--gray)}
 
-    /* ── Footer ── */
-    .footer {
-      position: relative; z-index: 2;
-      text-align: center;
-      padding: 2rem 1rem 1rem;
-      font-size: .78rem;
-      color: var(--text-dim);
-      animation: fadeUp 1.2s ease .5s both;
-    }
-    .footer a { color: var(--gem-amethyst); text-decoration: none; }
-    .footer a:hover { color: var(--gem-cyan); }
+    /* ── Reveal animation ── */
+    .reveal{opacity:0;transform:translateY(28px)}
+    @keyframes revealUp{to{opacity:1;transform:translateY(0)}}
 
-    /* ── GitHub link top-right ── */
-    .github-link {
-      position: fixed;
-      top: 1.2rem;
-      right: 1.4rem;
-      z-index: 100;
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-      padding: .5rem 1.1rem;
-      border-radius: 999px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.15);
-      color: var(--text-light);
-      font-size: .82rem;
-      font-weight: 500;
-      text-decoration: none;
-      backdrop-filter: blur(10px);
-      transition: background .25s, border-color .25s;
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:#05030F}
+    ::-webkit-scrollbar-thumb{background:#8B5CF6;border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:#FF2FA3}
+
+    @media(max-width:900px){
+      .hero-row{flex-direction:column!important;text-align:center}
+      .hero-deco-left,.hero-deco-right{display:none!important}
+      .nav-links{display:none}
     }
-    .github-link:hover { background: rgba(108,63,197,.3); border-color: var(--gem-violet); }
-    .github-link svg { width: 18px; height: 18px; }
+    @media(max-width:640px){
+      .navbar{padding:.65rem .9rem}
+    }
   </style>
 </head>
 <body>
 
-  <canvas id="starfield"></canvas>
-  <div class="overlay"></div>
+<!-- Background layers -->
+<div class="vhs-noise"></div>
+<div class="scanlines"></div>
+<canvas id="stars"></canvas>
+<div id="shapes"></div>
+<div class="blob blob-a"></div>
+<div class="blob blob-b"></div>
+<div class="blob blob-c"></div>
+<div class="retro-grid"><div class="retro-grid-plane"></div></div>
 
-  <!-- Floating gems -->
-  <div class="gem-float" style="width:12px;height:12px;background:var(--gem-amethyst);left:10%;animation-duration:18s;animation-delay:0s;"></div>
-  <div class="gem-float" style="width:8px;height:8px;background:var(--gem-cyan);left:25%;animation-duration:22s;animation-delay:4s;"></div>
-  <div class="gem-float" style="width:14px;height:14px;background:var(--gem-rose);left:45%;animation-duration:15s;animation-delay:2s;"></div>
-  <div class="gem-float" style="width:6px;height:6px;background:var(--gem-gold);left:65%;animation-duration:20s;animation-delay:7s;"></div>
-  <div class="gem-float" style="width:10px;height:10px;background:var(--gem-teal);left:80%;animation-duration:17s;animation-delay:1s;"></div>
-  <div class="gem-float" style="width:16px;height:16px;background:var(--gem-violet);left:90%;animation-duration:25s;animation-delay:5s;"></div>
+<!-- ════════════════════════════ NAVBAR ════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div style="display:flex;flex-direction:column;gap:1px;line-height:1">
+    <span class="brand-90s">90s</span>
+    <span class="brand-name">GAMESTONE</span>
+    <span class="brand-sub">PREDICTION</span>
+  </div>
 
-  <!-- GitHub top-right -->
-  <a href="https://github.com/Shivam122gupta/Gemstoneprediction" class="github-link" target="_blank" id="github-repo-link">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-    GitHub
+  <div class="nav-links" style="display:flex;align-items:center;gap:20px">
+    <a href="#hero"         class="nav-link active">HOME</a>
+    <a href="/predictdata"  class="nav-link">PREDICT</a>
+    <a href="#howitworks"   class="nav-link">HOW IT WORKS</a>
+    <a href="#features"     class="nav-link">FEATURES</a>
+    <a href="#about"        class="nav-link">ABOUT</a>
+  </div>
+
+  <a href="https://github.com/Shivam122gupta/Gemstoneprediction" target="_blank" class="gh-btn" id="nav-github">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+    GITHUB
   </a>
+</nav>
 
-  <main class="page">
-    <section class="hero">
-      <div class="gem-icon-wrap">
-        <!-- Diamond SVG -->
-        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="32,4 56,22 48,60 16,60 8,22" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.5"/>
-          <polygon points="32,4 56,22 32,18" fill="rgba(0,212,255,0.5)"/>
-          <polygon points="32,4 8,22 32,18" fill="rgba(155,89,232,0.6)"/>
-          <polygon points="32,18 56,22 48,60" fill="rgba(0,212,255,0.25)"/>
-          <polygon points="32,18 8,22 16,60" fill="rgba(155,89,232,0.35)"/>
-          <polygon points="32,18 48,60 16,60" fill="rgba(255,255,255,0.18)"/>
-          <polygon points="8,22 32,18 56,22 48,60 16,60" stroke="rgba(255,255,255,0.6)" stroke-width="1" fill="none"/>
+<!-- ════════════════════════════ HERO ════════════════════════════ -->
+<section id="hero" style="position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7rem 1.2rem 4rem">
+
+  <!-- Pill -->
+  <div class="pill" id="hero-pill" style="margin-bottom:2rem">
+    <span class="pill-dot"></span>
+    ML MODEL ACTIVE &nbsp;•&nbsp; 90s VIBES &nbsp;•&nbsp; MODERN AI
+  </div>
+
+  <!-- Three-column hero row -->
+  <div class="hero-row" id="hero-row" style="display:flex;align-items:center;justify-content:center;gap:3.5rem;width:100%;max-width:1200px">
+
+    <!-- Left: Diamond -->
+    <div class="hero-deco-left" style="flex-shrink:0;width:200px;display:flex;align-items:center;justify-content:center">
+      <div class="diamond-wrap" id="diamond">
+        <div class="diam-halo"></div>
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" style="position:relative;z-index:1">
+          <defs>
+            <filter id="dglow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="10" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="dg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00E5FF"/><stop offset="100%" stop-color="#8B5CF6"/></linearGradient>
+            <linearGradient id="dg2" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF2FA3"/><stop offset="100%" stop-color="#8B5CF6"/></linearGradient>
+          </defs>
+          <polygon points="90,8 166,58 140,166 40,166 14,58" fill="rgba(0,229,255,.05)" stroke="url(#dg1)" stroke-width="1.8" filter="url(#dglow)"/>
+          <polygon points="90,8 166,58 90,50"  fill="url(#dg1)" opacity=".72"/>
+          <polygon points="90,8 14,58 90,50"   fill="url(#dg2)" opacity=".72"/>
+          <polygon points="90,50 166,58 140,166" fill="rgba(0,229,255,.18)"/>
+          <polygon points="90,50 14,58 40,166"  fill="rgba(139,92,246,.26)"/>
+          <polygon points="90,50 140,166 40,166" fill="rgba(255,255,255,.05)"/>
+          <!-- sparkle lines -->
+          <line x1="90" y1="8"   x2="90"  y2="0"   stroke="#00E5FF" stroke-width="1.5" opacity=".8"/>
+          <line x1="166" y1="58" x2="174" y2="54"  stroke="#00E5FF" stroke-width="1.5" opacity=".8"/>
+          <line x1="14"  y1="58" x2="6"   y2="54"  stroke="#8B5CF6" stroke-width="1.5" opacity=".8"/>
+          <line x1="140" y1="166" x2="144" y2="174" stroke="#FF2FA3" stroke-width="1.5" opacity=".8"/>
+          <line x1="40"  y1="166" x2="36"  y2="174" stroke="#FF2FA3" stroke-width="1.5" opacity=".8"/>
+          <circle cx="90" cy="50" r="4" fill="white" opacity=".9"/>
+          <circle cx="90" cy="50" r="10" fill="rgba(0,229,255,.2)"/>
         </svg>
-      </div>
-
-      <div class="badge">✦ AI-Powered Prediction</div>
-
-      <h1 class="hero-title">Gemstone Price<br/>Prediction</h1>
-
-      <p class="hero-sub">
-        Unlock the true value of any gemstone with our advanced machine learning model.
-        Input your gem's attributes — get an instant, accurate price estimate.
-      </p>
-
-      <a href="/predictdata" class="cta-btn" id="predict-cta">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-        </svg>
-        Predict Now
-      </a>
-    </section>
-
-    <div class="features">
-      <div class="feat-card">
-        <span class="icon">💎</span>
-        <h3>9 Attributes</h3>
-        <p>Carat, cut, color, clarity, depth, table, and dimensions.</p>
-      </div>
-      <div class="feat-card">
-        <span class="icon">🤖</span>
-        <h3>ML Powered</h3>
-        <p>CatBoost model trained on thousands of gemstone records.</p>
-      </div>
-      <div class="feat-card">
-        <span class="icon">⚡</span>
-        <h3>Instant Results</h3>
-        <p>Get an accurate price estimate in milliseconds.</p>
-      </div>
-      <div class="feat-card">
-        <span class="icon">🔮</span>
-        <h3>High Accuracy</h3>
-        <p>Optimized pipeline for reliable, consistent predictions.</p>
       </div>
     </div>
-  </main>
 
-  <footer class="footer">
-    <p>GemPredict &mdash; Gemstone Price Prediction &bull; <a href="https://github.com/Shivam122gupta/Gemstoneprediction" target="_blank">GitHub</a></p>
-  </footer>
+    <!-- Center: Heading + Buttons -->
+    <div id="hero-center" style="flex:1;text-align:center;max-width:660px">
+      <div class="hero-estimate">ESTIMATE</div>
+      <div class="hero-gemstone">GEMSTONE PRICE</div>
 
-  <script>
-    // ── Starfield canvas ──
-    const canvas = document.getElementById('starfield');
-    const ctx    = canvas.getContext('2d');
-    let stars    = [];
+      <p style="font-family:'Inter',sans-serif;font-size:.97rem;color:var(--gray);line-height:1.8;max-width:500px;margin:1.4rem auto 2.2rem">
+        Predict the true value of any gemstone using
+        <span style="color:var(--cyan);font-weight:600">advanced machine learning</span>.
+        Fast, accurate and AI-powered valuation within milliseconds.
+      </p>
 
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
+      <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap">
+        <a href="/predictdata" class="arcade-btn" id="hero-cta">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          PREDICT NOW
+        </a>
+        <a href="https://github.com/Shivam122gupta/Gemstoneprediction" target="_blank" class="ghost-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          VIEW CODE
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:2.5rem;margin-top:2.5rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.07)">
+        <div style="text-align:center"><div class="stat-val">9</div><div class="stat-label">Features</div></div>
+        <div style="width:1px;height:38px;background:rgba(255,255,255,.1)"></div>
+        <div style="text-align:center"><div class="stat-val">53K+</div><div class="stat-label">Records</div></div>
+        <div style="width:1px;height:38px;background:rgba(255,255,255,.1)"></div>
+        <div style="text-align:center"><div class="stat-val" style="font-size:1.4rem">CAT<br>BOOST</div><div class="stat-label">Algorithm</div></div>
+      </div>
+    </div>
+
+    <!-- Right: GameBoy -->
+    <div class="hero-deco-right" style="flex-shrink:0;width:190px;display:flex;align-items:center;justify-content:center">
+      <div class="gameboy-wrap" id="gameboy">
+        <svg width="170" height="230" viewBox="0 0 170 230" fill="none">
+          <rect x="10" y="10" width="150" height="210" rx="24" fill="#180a38" stroke="#8B5CF6" stroke-width="2"/>
+          <rect x="10" y="10" width="150" height="210" rx="24" fill="url(#gbg)"/>
+          <rect x="24" y="24" width="122" height="96" rx="9" fill="#08051a" stroke="#5c38a8" stroke-width="1.5"/>
+          <rect x="33" y="32" width="104" height="80" rx="5" fill="#0a1c18"/>
+          <!-- gem on screen -->
+          <polygon points="85,44 108,62 85,80 62,62" fill="none" stroke="#00E5FF" stroke-width="1.5"/>
+          <polygon points="85,44 108,62 85,58" fill="rgba(0,229,255,.45)"/>
+          <polygon points="85,44 62,62 85,58"  fill="rgba(139,92,246,.55)"/>
+          <polygon points="85,58 108,62 85,80" fill="rgba(0,229,255,.15)"/>
+          <polygon points="85,58 62,62 85,80"  fill="rgba(139,92,246,.22)"/>
+          <rect x="33" y="32" width="104" height="80" rx="5" fill="url(#scglow)" opacity=".55"/>
+          <text x="85" y="100" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#00E5FF" opacity=".8" letter-spacing="1">GAMESTONE</text>
+          <!-- d-pad -->
+          <rect x="28" y="138" width="14" height="40" rx="3" fill="#2c1860"/>
+          <rect x="21" y="145" width="28" height="14" rx="3" fill="#2c1860"/>
+          <circle cx="35" cy="158" r="5" fill="#160b30" stroke="#8B5CF6" stroke-width="1"/>
+          <!-- A B -->
+          <circle cx="120" cy="148" r="9.5" fill="#FF2FA3" opacity=".92"/>
+          <circle cx="140" cy="157" r="9.5" fill="#8B5CF6" opacity=".92"/>
+          <text x="120" y="152" text-anchor="middle" font-family="monospace" font-size="7.5" fill="white" font-weight="bold">A</text>
+          <text x="140" y="161" text-anchor="middle" font-family="monospace" font-size="7.5" fill="white" font-weight="bold">B</text>
+          <!-- select start -->
+          <rect x="56" y="162" width="20" height="5" rx="2.5" fill="#4a2a90"/>
+          <rect x="86" y="162" width="20" height="5" rx="2.5" fill="#4a2a90"/>
+          <text x="66" y="175" text-anchor="middle" font-family="monospace" font-size="5" fill="#8B5CF6">SELECT</text>
+          <text x="96" y="175" text-anchor="middle" font-family="monospace" font-size="5" fill="#8B5CF6">START</text>
+          <!-- speaker -->
+          <circle cx="115" cy="196" r="2.2" fill="#3a1878" opacity=".85"/>
+          <circle cx="124" cy="196" r="2.2" fill="#3a1878" opacity=".85"/>
+          <circle cx="133" cy="196" r="2.2" fill="#3a1878" opacity=".85"/>
+          <circle cx="115" cy="205" r="2.2" fill="#3a1878" opacity=".85"/>
+          <circle cx="124" cy="205" r="2.2" fill="#3a1878" opacity=".85"/>
+          <circle cx="133" cy="205" r="2.2" fill="#3a1878" opacity=".85"/>
+          <!-- power LED -->
+          <circle cx="28" cy="195" r="3.5" fill="#C6FF00" opacity=".95"/>
+          <circle cx="28" cy="195" r="7" fill="rgba(198,255,0,.18)"/>
+          <defs>
+            <linearGradient id="gbg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(139,92,246,.22)"/>
+              <stop offset="100%" stop-color="rgba(11,8,32,.05)"/>
+            </linearGradient>
+            <radialGradient id="scglow" cx="50%" cy="35%" r="55%">
+              <stop offset="0%" stop-color="#00E5FF" stop-opacity=".35"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+
+  </div><!-- /hero-row -->
+
+  <!-- Scroll arrow -->
+  <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;opacity:.4;animation:scrollFade 1.8s ease-in-out infinite">
+    <span style="font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.2em;color:var(--gray)">SCROLL</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+  <style>@keyframes scrollFade{0%,100%{opacity:.35;transform:translateX(-50%) translateY(0)}50%{opacity:.7;transform:translateX(-50%) translateY(5px)}}</style>
+</section>
+
+<!-- ════════════════════════════ HOW IT WORKS ════════════════════════════ -->
+<section id="howitworks" style="position:relative;z-index:10;padding:6rem 1.2rem">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
+      <div class="sec-tag" style="margin-bottom:.8rem">⚡ PROCESS</div>
+      <div class="sec-title">HOW IT <span style="color:var(--cyan);text-shadow:0 0 20px rgba(0,229,255,.45)">WORKS</span></div>
+      <p style="font-family:'Inter',sans-serif;font-size:.88rem;color:var(--gray);max-width:400px;margin:.8rem auto 0;line-height:1.7">Three steps. Zero complexity. Instant results.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.4rem">
+      <div class="feat-card cc reveal">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3.8rem;color:rgba(0,229,255,.12);line-height:1;margin-bottom:.4rem">01</div>
+        <div class="feat-icon">🔢</div>
+        <div class="feat-title">Enter Attributes</div>
+        <div class="feat-desc">Input carat, cut, color, clarity, depth, table and XYZ dimensions with full precision.</div>
+      </div>
+      <div class="feat-card cv reveal" style="animation-delay:.1s">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3.8rem;color:rgba(139,92,246,.12);line-height:1;margin-bottom:.4rem">02</div>
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">AI Processes</div>
+        <div class="feat-desc">CatBoost ML model analyzes inputs through a full preprocessing and inference pipeline.</div>
+      </div>
+      <div class="feat-card cl reveal" style="animation-delay:.2s">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3.8rem;color:rgba(198,255,0,.1);line-height:1;margin-bottom:.4rem">03</div>
+        <div class="feat-icon">💰</div>
+        <div class="feat-title">Get Your Price</div>
+        <div class="feat-desc">Receive an accurate, AI-powered market price estimate within milliseconds.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ FEATURES ════════════════════════════ -->
+<section id="features" style="position:relative;z-index:10;padding:5rem 1.2rem">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
+      <div class="sec-tag" style="margin-bottom:.8rem">✦ CAPABILITIES</div>
+      <div class="sec-title">CORE <span style="color:var(--pink);text-shadow:0 0 20px rgba(255,47,163,.45)">FEATURES</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.3rem">
+      <div class="feat-card cp reveal"><div class="feat-icon">💎</div><div class="feat-title">9 Attributes</div><div class="feat-desc">Carat, cut, color, clarity, depth, table, X, Y, Z — full-spectrum analysis.</div></div>
+      <div class="feat-card cc reveal" style="animation-delay:.08s"><div class="feat-icon">🤖</div><div class="feat-title">ML Powered</div><div class="feat-desc">Thousands of real gemstone records used to train a powerful gradient boosting model.</div></div>
+      <div class="feat-card cv reveal" style="animation-delay:.15s"><div class="feat-icon">⚡</div><div class="feat-title">Instant Results</div><div class="feat-desc">Predicted market value returned within milliseconds of form submission.</div></div>
+      <div class="feat-card cl reveal" style="animation-delay:.22s"><div class="feat-icon">🎯</div><div class="feat-title">High Accuracy</div><div class="feat-desc">CatBoost optimized with StandardScaler and full feature engineering pipeline.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ ABOUT / CTA ════════════════════════════ -->
+<section id="about" style="position:relative;z-index:10;padding:6rem 1.2rem">
+  <div style="max-width:720px;margin:0 auto;text-align:center" class="reveal">
+    <div style="font-size:5rem;margin-bottom:1.4rem;filter:drop-shadow(0 0 18px rgba(0,229,255,.45))">💠</div>
+    <div class="sec-tag" style="margin-bottom:1rem">ABOUT THE PROJECT</div>
+    <div class="sec-title" style="margin-bottom:1.2rem">BUILT FOR <span style="color:var(--lime);text-shadow:0 0 18px rgba(198,255,0,.38)">PRECISION</span></div>
+    <p style="font-family:'Inter',sans-serif;font-size:.95rem;color:var(--gray);line-height:1.82;max-width:520px;margin:0 auto 2.4rem">
+      An end-to-end ML project with modular data ingestion, transformation, and CatBoost training pipelines. Wrapped in a clean Flask API with a premium retro-futuristic UI.
+    </p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.9rem;margin-bottom:2.5rem">
+      <a href="/predictdata" class="arcade-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        TRY THE MODEL
+      </a>
+      <a href="https://github.com/Shivam122gupta/Gemstoneprediction" target="_blank" class="ghost-btn">VIEW ON GITHUB</a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem">
+      <span style="padding:.28rem .85rem;border-radius:999px;border:1px solid rgba(139,92,246,.3);font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.1em;color:#8B5CF6;background:rgba(139,92,246,.07)">PYTHON</span>
+      <span style="padding:.28rem .85rem;border-radius:999px;border:1px solid rgba(255,47,163,.3);font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.1em;color:#FF2FA3;background:rgba(255,47,163,.06)">FLASK</span>
+      <span style="padding:.28rem .85rem;border-radius:999px;border:1px solid rgba(0,229,255,.3);font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.1em;color:#00E5FF;background:rgba(0,229,255,.06)">CATBOOST</span>
+      <span style="padding:.28rem .85rem;border-radius:999px;border:1px solid rgba(198,255,0,.3);font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.1em;color:#C6FF00;background:rgba(198,255,0,.05)">SCIKIT-LEARN</span>
+      <span style="padding:.28rem .85rem;border-radius:999px;border:1px solid rgba(139,92,246,.3);font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.1em;color:#8B5CF6;background:rgba(139,92,246,.07)">PANDAS</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ FOOTER ════════════════════════════ -->
+<footer style="position:relative;z-index:10;padding:3rem 1.2rem;text-align:center">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:1.4rem">
+    <div class="bot-badge reveal">
+      <span class="badge-text">BUILT WITH MODERN AI</span>
+      <span style="color:var(--pink);font-size:.9rem">•</span>
+      <span class="badge-text">INSPIRED BY THE 90s</span>
+      <span style="font-size:1.1rem;animation:gbPulse 1.6s ease-in-out infinite">🕹️</span>
+    </div>
+    <div style="width:100%;max-width:380px;height:1px;background:linear-gradient(to right,transparent,rgba(139,92,246,.38),transparent)"></div>
+    <span style="font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.18em;color:rgba(182,184,204,.35)">
+      © 2024 GAMESTONE PREDICTION &nbsp;•&nbsp;
+      <a href="https://github.com/Shivam122gupta/Gemstoneprediction" target="_blank" style="color:rgba(139,92,246,.55);text-decoration:none">GITHUB ↗</a>
+    </span>
+  </div>
+  <style>@keyframes gbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}</style>
+</footer>
+
+<!-- ════════════════════════════ SCRIPTS ════════════════════════════ -->
+<script>
+/* ── Stars ─────────────────────────────────────────────── */
+(()=>{
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  let W,H,stars=[];
+  const resize=()=>{W=c.width=innerWidth;H=c.height=innerHeight};
+  resize();window.addEventListener('resize',()=>{resize();init()});
+  const init=()=>{
+    stars=[];const n=Math.floor(W*H/1800);
+    for(let i=0;i<n;i++){
+      const r=Math.random();
+      stars.push({x:Math.random()*W,y:Math.random()*H,
+        s:r<.82?Math.random()*.7+.2:r<.96?Math.random()*1.3+.8:Math.random()*2+1.4,
+        a:Math.random()*.7+.15,sp:Math.random()*.005+.001,ph:Math.random()*Math.PI*2,
+        col:r<.68?'248,250,252':r<.84?'0,229,255':r<.95?'139,92,246':'255,47,163'})
     }
-    resize();
-    window.addEventListener('resize', () => { resize(); buildStars(); });
-
-    function buildStars() {
-      stars = [];
-      const count = Math.floor((canvas.width * canvas.height) / 4500);
-      for (let i = 0; i < count; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          r: Math.random() * 1.4 + .2,
-          a: Math.random(),
-          speed: Math.random() * .004 + .001,
-          phase: Math.random() * Math.PI * 2
-        });
+  };
+  init();
+  const draw=t=>{
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      const a=s.a*(.45+.55*Math.sin(t*s.sp+s.ph));
+      ctx.beginPath();ctx.arc(s.x,s.y,s.s,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${s.col},${a})`;ctx.fill();
+      if(s.s>1.5){
+        ctx.strokeStyle=`rgba(${s.col},${a*.4})`;ctx.lineWidth=.5;
+        ctx.beginPath();
+        ctx.moveTo(s.x-s.s*2.8,s.y);ctx.lineTo(s.x+s.s*2.8,s.y);
+        ctx.moveTo(s.x,s.y-s.s*2.8);ctx.lineTo(s.x,s.y+s.s*2.8);
+        ctx.stroke();
       }
     }
-    buildStars();
+    requestAnimationFrame(draw);
+  };
+  requestAnimationFrame(draw);
+})();
 
-    function drawStars(t) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stars.forEach(s => {
-        const alpha = .3 + .7 * (Math.sin(t * s.speed + s.phase) * .5 + .5);
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(220,210,255,${alpha * s.a})`;
-        ctx.fill();
-      });
-      requestAnimationFrame(drawStars);
-    }
-    requestAnimationFrame(drawStars);
+/* ── Floating shapes ─────────────────────────────────────── */
+(()=>{
+  const cont=document.getElementById('shapes');
+  const cols=['#FF2FA3','#00E5FF','#8B5CF6','#C6FF00','#FFE600'];
+  const types=['tri','circ','cross','diam','px','line','sq'];
+  for(let i=0;i<60;i++){
+    const col=cols[Math.floor(Math.random()*cols.length)];
+    const type=types[Math.floor(Math.random()*types.length)];
+    const sz=8+Math.random()*26,x=Math.random()*100,y=Math.random()*100;
+    const dur=14+Math.random()*22,del=Math.random()*12,op=.12+Math.random()*.3;
+    const el=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    el.style.cssText=`position:fixed;left:${x}vw;top:${y}vh;width:${sz}px;height:${sz}px;opacity:${op};pointer-events:none;z-index:0;overflow:visible;animation:sf ${dur}s ease-in-out ${del}s infinite`;
+    el.setAttribute('viewBox',`0 0 ${sz} ${sz}`);
+    const h=sz/2;let inner='';
+    if(type==='tri')inner=`<polygon points="${h},1 ${sz-1},${sz-1} 1,${sz-1}" fill="none" stroke="${col}" stroke-width="1.4"/>`;
+    else if(type==='circ')inner=`<circle cx="${h}" cy="${h}" r="${h-1}" fill="none" stroke="${col}" stroke-width="1.4"/>`;
+    else if(type==='cross')inner=`<line x1="${h}" y1="0" x2="${h}" y2="${sz}" stroke="${col}" stroke-width="1.4"/><line x1="0" y1="${h}" x2="${sz}" y2="${h}" stroke="${col}" stroke-width="1.4"/>`;
+    else if(type==='diam')inner=`<polygon points="${h},0 ${sz},${h} ${h},${sz} 0,${h}" fill="none" stroke="${col}" stroke-width="1.4"/>`;
+    else if(type==='sq')inner=`<rect x="1" y="1" width="${sz-2}" height="${sz-2}" fill="none" stroke="${col}" stroke-width="1.4"/>`;
+    else if(type==='line')inner=`<line x1="0" y1="${h}" x2="${sz}" y2="${h}" stroke="${col}" stroke-width="1.4"/>`;
+    else{let px='';for(let r=0;r<4;r++)for(let c2=0;c2<4;c2++)if(Math.random()>.42)px+=`<rect x="${r*3}" y="${c2*3}" width="2" height="2" fill="${col}"/>`;inner=px}
+    el.innerHTML=inner;cont.appendChild(el);
+  }
+})();
+document.head.insertAdjacentHTML('beforeend',`<style>@keyframes sf{0%,100%{transform:translateY(0) rotate(0deg) scale(1)}33%{transform:translateY(-24px) rotate(130deg) scale(1.08)}66%{transform:translateY(12px) rotate(260deg) scale(.94)}}</style>`);
 
-    // ── Subtle mouse parallax ──
-    document.addEventListener('mousemove', e => {
-      const xPct = (e.clientX / window.innerWidth  - .5) * 18;
-      const yPct = (e.clientY / window.innerHeight - .5) * 12;
-      document.querySelector('.hero').style.transform = `translate(${xPct * .5}px, ${yPct * .5}px)`;
-    });
-  </script>
+/* ── GSAP ───────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded',()=>{
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.from('#navbar',{y:-70,opacity:0,duration:.9,ease:'back.out(1.4)'});
+  gsap.from('#hero-pill',{y:20,opacity:0,duration:.7,delay:.35});
+  gsap.from('.hero-estimate',{y:50,opacity:0,duration:.9,delay:.5,ease:'power3.out'});
+  gsap.from('.hero-gemstone',{y:40,opacity:0,duration:.8,delay:.7,ease:'power2.out'});
+  gsap.from('#hero-center p',{y:20,opacity:0,duration:.6,delay:.9});
+  gsap.from('#hero-center .arcade-btn, #hero-center .ghost-btn',{y:18,opacity:0,stagger:.12,duration:.6,delay:1.1});
+  gsap.from('#diamond',{x:-50,opacity:0,duration:1,delay:.6,ease:'back.out(1.2)'});
+  gsap.from('#gameboy',{x:50,opacity:0,duration:1,delay:.65,ease:'back.out(1.2)'});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    gsap.fromTo(el,{y:35,opacity:0},{y:0,opacity:1,duration:.75,delay:(i%4)*.07,
+      scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}});
+  });
+});
+
+/* ── Mouse parallax ─────────────────────────────────────── */
+document.addEventListener('mousemove',e=>{
+  const xP=(e.clientX/innerWidth-.5),yP=(e.clientY/innerHeight-.5);
+  const d=document.querySelector('.diamond-wrap');
+  const g=document.querySelector('.gameboy-wrap');
+  if(d)d.style.transform=`translateY(${Math.sin(Date.now()*.001)*-16}px) rotate(${xP*5}deg) translateX(${xP*-14}px)`;
+  if(g)g.style.transform=`translateY(${Math.sin(Date.now()*.0009)*-18}px) rotate(${-1.5+xP*5}deg) translateX(${xP*14}px)`;
+  document.querySelectorAll('.blob').forEach((b,i)=>{
+    const f=(i+1)*.25;
+    b.style.transform=`translateX(${xP*-18*f}px) translateY(${yP*-12*f}px)`;
+  });
+});
+</script>
 </body>
 </html>
