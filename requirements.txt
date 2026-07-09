@@ -10,5 +10,4 @@ scikit-learn==1.6.1
 catboost==1.2.8
 xgboost==3.0.2
 dill==0.3.8
-
 -e .
